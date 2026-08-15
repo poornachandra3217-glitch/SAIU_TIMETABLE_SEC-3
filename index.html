@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SaiUOS · Section 3</title>
+<meta name="description" content="Weekly class timetable for SaiUOS Section 3 students, with attendance tracking, announcements and resources.">
+<meta name="theme-color" content="#0a0e1a">
+
+<script>
+  // Applied before first paint so the page never flashes the wrong theme.
+  (function () {
+    try {
+      var saved = window.localStorage.getItem("saiuos-timetable-theme");
+      var theme = (saved === "light" || saved === "dark")
+        ? saved
+        : (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+      document.documentElement.setAttribute("data-theme", theme);
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ LOADER ============ -->
+<div class="loader-overlay" id="loaderOverlay" aria-hidden="true">
+  <div class="loader-glow"></div>
+  <div class="logo3d logo3d-lg" aria-hidden="true">
+    <div class="logo3d-shadow"></div>
+    <div class="logo3d-inner">
+      <span class="logo3d-letter">S</span>
+      <span class="logo3d-sheen"></span>
+    </div>
+  </div>
+  <div class="loader-word">Sai<span>UOS</span></div>
+  <div class="loader-bar"><span class="loader-bar-fill"></span></div>
+  <p class="loader-text">Preparing your dashboard<span class="loader-dots"><i></i><i></i><i></i></span></p>
+</div>
+
+<div class="app">
+
+  <!-- ============ DESKTOP SIDEBAR ============ -->
+  <aside class="app-sidebar" id="appSidebar" aria-label="Primary navigation">
+    <div class="sidebar-brand">
+      <div class="logo3d logo3d-sm" aria-hidden="true">
+        <div class="logo3d-inner">
+          <span class="logo3d-letter">S</span>
+          <span class="logo3d-sheen"></span>
+        </div>
+      </div>
+      <div class="brand-text">
+        <h1>SaiUOS</h1>
+        <p id="cohortLabel">Year 2 · SCDS · Section 3</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Sections">
+      <button class="nav-item" data-nav="home" type="button">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9.5a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" data-nav="timetable" type="button">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Timetable</span>
+      </button>
+      <button class="nav-item" data-nav="announcements" type="button">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Announcements</span>
+      </button>
+      <button class="nav-item" data-nav="resources" type="button">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19.5V6a2 2 0 0 1 2-2h9l5 5v10.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 4v4a1 1 0 0 0 1 1h4M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Resources</span>
+      </button>
+      <button class="nav-item" data-nav="profile" type="button">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8.2" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M4.8 20c1.2-3.6 4-5.4 7.2-5.4s6 1.8 7.2 5.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Profile</span>
+      </button>
+    </nav>
+
+    <button class="theme-toggle sidebar-theme-toggle" id="themeToggleDesktop" type="button" aria-label="Switch theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2 5.5 5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 14.2A8.4 8.4 0 1 1 9.8 4a6.7 6.7 0 0 0 10.2 10.2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      <span id="themeToggleLabel">Dark mode</span>
+    </button>
+  </aside>
+
+  <div class="app-body">
+
+    <!-- ============ TOPBAR ============ -->
+    <header class="app-topbar">
+      <div class="topbar-brand">
+        <div class="logo3d logo3d-xs" aria-hidden="true">
+          <div class="logo3d-inner"><span class="logo3d-letter">S</span><span class="logo3d-sheen"></span></div>
+        </div>
+        <div class="brand-text">
+          <h1>SaiUOS <span>Timetable</span></h1>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="live-clock" aria-live="polite">
+          <span class="clock-dot" aria-hidden="true"></span>
+          <span id="liveTime">--:--</span>
+          <span class="clock-date" id="liveDate">—</span>
+        </div>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2 5.5 5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 14.2A8.4 8.4 0 1 1 9.8 4a6.7 6.7 0 0 0 10.2 10.2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-content" id="appContent">
+
+      <!-- ============ HOME VIEW ============ -->
+      <section class="view-panel" id="homeView">
+        <div class="glass hero-card">
+          <div class="hero-text">
+            <p class="hero-eyebrow" id="homeGreeting">Welcome back</p>
+            <h2 id="homeName">Section 3</h2>
+            <p class="hero-sub" id="homeSubline">Here&rsquo;s what your day looks like.</p>
+          </div>
+          <div class="hero-ring" id="homeAttendanceRing" aria-hidden="true">
+            <svg viewBox="0 0 84 84">
+              <circle class="ring-track" cx="42" cy="42" r="36"></circle>
+              <circle class="ring-fill" id="homeRingFill" cx="42" cy="42" r="36"></circle>
+            </svg>
+            <div class="ring-label">
+              <span id="homeRingPercent">--%</span>
+              <small>attendance</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="home-grid">
+          <section class="glass sidebar-card" aria-labelledby="nextClassHeading">
+            <div class="sidebar-card-head">
+              <h3 id="nextClassHeading">Next Class</h3>
+              <span class="clock-dot" aria-hidden="true"></span>
+            </div>
+            <div id="nextClassBody" class="sidebar-card-body"><!-- injected by script.js --></div>
+          </section>
+
+          <section class="glass sidebar-card" aria-labelledby="homeAnnounceHeading">
+            <div class="sidebar-card-head">
+              <h3 id="homeAnnounceHeading">Announcements</h3>
+              <button class="link-btn" data-nav="announcements" type="button">View all</button>
+            </div>
+            <ul class="announce-list" id="homeAnnounceList"><!-- injected by script.js --></ul>
+          </section>
+
+          <section class="glass sidebar-card span-2" aria-labelledby="homeTodayHeading">
+            <div class="sidebar-card-head">
+              <h3 id="homeTodayHeading">Today at a glance</h3>
+              <button class="link-btn" data-nav="timetable" type="button">Open timetable</button>
+            </div>
+            <ol class="mini-schedule" id="homeMiniSchedule"><!-- injected by script.js --></ol>
+          </section>
+
+          <section class="glass sidebar-card resource-teaser">
+            <div class="sidebar-card-head">
+              <h3>Resources</h3>
+            </div>
+            <p class="resource-teaser-text">Notes, slides and reading material for every subject — landing here soon.</p>
+            <button class="link-btn" data-nav="resources" type="button">Take a look →</button>
+          </section>
+        </div>
+      </section>
+
+      <!-- ============ TIMETABLE VIEW ============ -->
+      <section class="view-panel" id="timetableView" hidden>
+        <div class="panel-heading">
+          <h2>Timetable</h2>
+          <div class="view-toggle" role="tablist" aria-label="Timetable view">
+            <button class="view-btn is-active" data-view="day" role="tab" aria-selected="true">Day</button>
+            <button class="view-btn" data-view="week" role="tab" aria-selected="false">Week</button>
+          </div>
+        </div>
+
+        <nav class="day-nav" aria-label="Select day">
+          <button class="day-chip" data-day="mon">Mon</button>
+          <button class="day-chip" data-day="tue">Tue</button>
+          <button class="day-chip" data-day="wed">Wed</button>
+          <button class="day-chip" data-day="thu">Thu</button>
+          <button class="day-chip" data-day="fri">Fri</button>
+          <button class="today-btn" id="todayBtn">Today</button>
+        </nav>
+
+        <div class="timetable-layout">
+          <div class="timetable-main">
+            <!-- DAY SUB-VIEW -->
+            <div class="sub-view" id="dayView">
+              <div class="panel-heading panel-heading-sm">
+                <h3 id="dayViewTitle">Today&rsquo;s Schedule</h3>
+                <span class="count-pill" id="dayViewCount">0 classes</span>
+              </div>
+              <ol class="schedule-list" id="scheduleList"><!-- injected by script.js --></ol>
+              <p class="empty-state" id="dayEmptyState" hidden>No classes scheduled. Enjoy the free day.</p>
+            </div>
+
+            <!-- WEEK SUB-VIEW -->
+            <div class="sub-view" id="weekView" hidden>
+              <div class="panel-heading panel-heading-sm">
+                <h3>Week at a Glance</h3>
+                <div class="legend">
+                  <span class="legend-item"><i class="dot dot-lecture"></i>Lecture</span>
+                  <span class="legend-item"><i class="dot dot-lab"></i>Lab</span>
+                  <span class="legend-item"><i class="dot dot-break"></i>Break</span>
+                </div>
+              </div>
+              <div class="week-grid-scroll">
+                <div class="week-grid" id="weekGrid"><!-- injected by script.js --></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ UTILITY SIDEBAR (desktop) ============ -->
+          <aside class="app-rightbar" id="rightbar" aria-label="Notifications and attendance">
+            <section class="glass sidebar-card" aria-labelledby="nextClassHeading2">
+              <div class="sidebar-card-head">
+                <h3 id="nextClassHeading2">Next Class</h3>
+                <span class="clock-dot" aria-hidden="true"></span>
+              </div>
+              <div id="nextClassBody2" class="sidebar-card-body"><!-- injected by script.js --></div>
+            </section>
+
+            <section class="glass sidebar-card" aria-labelledby="announceHeading">
+              <div class="sidebar-card-head">
+                <h3 id="announceHeading">Announcements</h3>
+              </div>
+              <ul class="announce-list" id="announceListSide"><!-- injected by script.js --></ul>
+            </section>
+
+            <section class="glass sidebar-card" aria-labelledby="attendanceHeading">
+              <div class="sidebar-card-head">
+                <h3 id="attendanceHeading">Attendance</h3>
+                <span class="attendance-percent" id="attendancePercent">--%</span>
+              </div>
+              <div class="attendance-bar"><div class="attendance-fill" id="attendanceFill"></div></div>
+              <p class="attendance-hint" id="attendanceHint">Tap a finished class to mark yourself present.</p>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ ANNOUNCEMENTS VIEW ============ -->
+      <section class="view-panel" id="announcementsView" hidden>
+        <div class="panel-heading">
+          <h2>Announcements</h2>
+          <span class="count-pill" id="announcementsCount">0 updates</span>
+        </div>
+        <ul class="announce-list announce-list-full glass" id="announceListFull"><!-- injected by script.js --></ul>
+      </section>
+
+      <!-- ============ RESOURCES VIEW ============ -->
+      <section class="view-panel" id="resourcesView" hidden>
+        <div class="panel-heading">
+          <h2>Resources</h2>
+        </div>
+        <div class="glass resources-empty">
+          <div class="resources-empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 19.5V6a2 2 0 0 1 2-2h9l5 5v10.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 4v4a1 1 0 0 0 1 1h4M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Coming soon</h3>
+          <p>Subject notes, lab manuals, slides and reference material will show up here, organised by subject, as soon as they&rsquo;re added.</p>
+        </div>
+      </section>
+
+      <!-- ============ PROFILE VIEW (account) ============ -->
+      <section class="view-panel" id="profileView" hidden>
+        <div class="panel-heading">
+          <h2>Profile</h2>
+          <span class="count-pill" id="accountStatusPill">Not signed in</span>
+        </div>
+
+        <div class="profile-layout">
+          <div class="glass account-card">
+            <div class="account-avatar" id="accountAvatar" aria-hidden="true">S</div>
+
+            <form class="account-form" id="accountForm" novalidate>
+              <label class="field">
+                <span class="field-label">Full name</span>
+                <input type="text" id="accountName" name="accountName" placeholder="e.g. Praveen M" autocomplete="name" required>
+                <span class="field-error" id="accountNameError" hidden></span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">Roll / Register number</span>
+                <input type="text" id="accountRoll" name="accountRoll" placeholder="CDS/2025/****" autocomplete="off" inputmode="text" required>
+                <span class="field-hint">Format: <code>CDS/2025/****</code> &mdash; four digits, exactly as issued.</span>
+                <span class="field-error" id="accountRollError" hidden></span>
+              </label>
+
+              <label class="field">
+                <span class="field-label">College email</span>
+                <input type="text" id="accountEmail" name="accountEmail" placeholder="praveen.m-29@scds.saiuniversity.edu.in" autocomplete="email" inputmode="email" required>
+                <span class="field-hint">Type your full email &mdash; not just the number before <code>@</code>.</span>
+                <span class="field-error" id="accountEmailError" hidden></span>
+              </label>
+
+              <p class="field-static-label">Section 3 <span class="field-static-note">&middot; this app is scoped to Section 3</span></p>
+
+              <div class="account-actions">
+                <button class="btn-primary" id="accountSaveBtn" type="submit">Save account</button>
+                <button class="btn-ghost" id="accountResetBtn" type="button">Reset</button>
+              </div>
+
+              <p class="account-hint" id="accountSavedHint" hidden>Saved on this device &mdash; you&rsquo;ll be signed in next time you open this page.</p>
+            </form>
+          </div>
+
+          <div class="glass subject-attendance-card">
+            <div class="sidebar-card-head">
+              <h3>Attendance by subject</h3>
+              <span class="attendance-percent" id="profileOverallPercent">--%</span>
+            </div>
+            <ul class="subject-attendance-list" id="subjectAttendanceList"><!-- injected by script.js --></ul>
+            <p class="subject-attendance-empty" id="subjectAttendanceEmpty" hidden>Mark yourself present in Timetable to build your record here.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============ MOBILE BOTTOM NAV ============ -->
+  <nav class="bottom-nav" id="bottomNav" aria-label="Primary navigation">
+    <button class="bottom-nav-item" data-nav="home" type="button">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9.5a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="bottom-nav-item" data-nav="timetable" type="button">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Timetable</span>
+    </button>
+    <button class="bottom-nav-item" data-nav="announcements" type="button">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Announce</span>
+    </button>
+    <button class="bottom-nav-item" data-nav="profile" type="button">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8.2" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M4.8 20c1.2-3.6 4-5.4 7.2-5.4s6 1.8 7.2 5.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+</div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
