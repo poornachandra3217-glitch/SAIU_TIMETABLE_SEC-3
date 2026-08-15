@@ -62,3 +62,62 @@ Instead of checking different places for schedules, attendance, announcements an
 │   👤 Profile         → Manage student information            │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
+
+🟢 Live Class Status
+
+SaiUOS uses the current time to understand the status of scheduled classes.
+
+Classes can be identified as:
+
+┌─────────────────────┐
+│      UPCOMING       │
+└─────────────────────┘
+
+┌─────────────────────┐
+│     IN SESSION      │
+└─────────────────────┘
+
+┌─────────────────────┐
+│      COMPLETED      │
+└─────────────────────┘
+
+✅ Attendance Management
+
+Attendance is integrated directly into the timetable.
+
+After a class is completed and becomes eligible for attendance marking, the student can mark themselves present.
+
+Class Completed
+       │
+       ▼
+Attendance Available
+       │
+       ▼
+Student Marks Present
+       │
+       ▼
+Record Saved
+       │
+       ▼
+Attendance Percentage Updated
+
+
+📊 Attendance Analytics
+
+SaiUOS calculates attendance from the student's stored attendance records.
+
+Overall Attendance
+             86%
+
+██████████████████░░░
+
+Subject-wise Attendance
+
+Web Technology
+████████████████░░░░  82%
+
+Data Engineering
+██████████████████░░  91%
+
+Algorithms
+███████████████░░░░░  78%
