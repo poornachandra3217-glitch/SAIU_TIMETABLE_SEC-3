@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaiUOS · Timetable</title>
+<meta name="description" content="Weekly class timetable for SaiUOS students.">
+
+<script>
+  // Applied before first paint so the page never flashes the wrong theme.
+  (function () {
+    try {
+      var saved = window.localStorage.getItem("saiuos-timetable-theme");
+      var theme = (saved === "light" || saved === "dark")
+        ? saved
+        : (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+      document.documentElement.setAttribute("data-theme", theme);
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ LOADER ============ -->
+<div class="loader-overlay" id="loaderOverlay" aria-hidden="true">
+  <div class="loader-mark" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M12 12v8M12 12L3 7M12 12l9-5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="loader-spinner" aria-hidden="true"></div>
+  <p class="loader-text">Loading your timetable&hellip;</p>
+</div>
+
+<div class="app">
+
+  <!-- ============ HEADER ============ -->
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M12 12v8M12 12L3 7M12 12l9-5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <h1>SaiUOS <span>Timetable</span></h1>
+        <p class="brand-sub" id="cohortLabel">Year 2 · SCDS</p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <label class="section-select-wrap" for="sectionSelect">
+        <span class="section-select-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </span>
+        <select id="sectionSelect" aria-label="Select your section"><!-- options injected by script.js --></select>
+      </label>
+
+      <div class="live-clock" aria-live="polite">
+        <span class="clock-dot" aria-hidden="true"></span>
+        <span id="liveTime">--:--</span>
+        <span class="clock-date" id="liveDate">—</span>
+      </div>
+
+      <div class="view-toggle" role="tablist" aria-label="Timetable view">
+        <button class="view-btn is-active" data-view="day" role="tab" aria-selected="true">Day</button>
+        <button class="view-btn" data-view="week" role="tab" aria-selected="false">Week</button>
+        <button class="view-btn" data-view="account" role="tab" aria-selected="false">Account</button>
+      </div>
+
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2 5.5 5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M20 14.2A8.4 8.4 0 1 1 9.8 4a6.7 6.7 0 0 0 10.2 10.2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ DAY NAV ============ -->
+  <nav class="day-nav" aria-label="Select day">
+    <button class="day-chip" data-day="mon">Mon</button>
+    <button class="day-chip" data-day="tue">Tue</button>
+    <button class="day-chip" data-day="wed">Wed</button>
+    <button class="day-chip" data-day="thu">Thu</button>
+    <button class="day-chip" data-day="fri">Fri</button>
+    <button class="today-btn" id="todayBtn">Today</button>
+  </nav>
+
+  <!-- ============ DAY VIEW ============ -->
+  <main class="view-panel" id="dayView">
+    <div class="panel-heading">
+      <h2 id="dayViewTitle">Today&rsquo;s Schedule</h2>
+      <span class="count-pill" id="dayViewCount">0 classes</span>
+    </div>
+
+    <ol class="schedule-list" id="scheduleList"><!-- injected by script.js --></ol>
+
+    <p class="empty-state" id="dayEmptyState" hidden>No classes scheduled. Enjoy the free day.</p>
+  </main>
+
+  <!-- ============ WEEK VIEW ============ -->
+  <main class="view-panel" id="weekView" hidden>
+    <div class="panel-heading">
+      <h2>Week at a Glance</h2>
+      <div class="legend">
+        <span class="legend-item"><i class="dot dot-lecture"></i>Lecture</span>
+        <span class="legend-item"><i class="dot dot-lab"></i>Lab</span>
+        <span class="legend-item"><i class="dot dot-break"></i>Break</span>
+      </div>
+    </div>
+
+    <div class="week-grid-scroll">
+      <div class="week-grid" id="weekGrid">
+        <!-- time axis + day columns injected by script.js -->
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ ACCOUNT VIEW ============ -->
+  <main class="view-panel" id="accountView" hidden>
+    <div class="panel-heading">
+      <h2>Student Account</h2>
+      <span class="count-pill" id="accountStatusPill">Not signed in</span>
+    </div>
+
+    <div class="account-card">
+      <div class="account-avatar" id="accountAvatar" aria-hidden="true">S</div>
+
+      <form class="account-form" id="accountForm">
+        <label class="field">
+          <span class="field-label">Full name</span>
+          <input type="text" id="accountName" name="accountName" placeholder="e.g. Hacker" autocomplete="name">
+        </label>
+
+        <label class="field">
+          <span class="field-label">Roll / Register number</span>
+          <input type="text" id="accountRoll" name="accountRoll" placeholder="e.g. CDS/2025/1075" autocomplete="off">
+        </label>
+
+        <label class="field">
+          <span class="field-label">Section</span>
+          <select id="accountSection" name="accountSection"><!-- options injected by script.js --></select>
+        </label>
+
+        <div class="account-actions">
+          <button class="btn-primary" id="accountSaveBtn" type="submit">Save account</button>
+          <button class="btn-ghost" id="accountResetBtn" type="button">Reset</button>
+        </div>
+
+        <p class="account-hint" id="accountSavedHint" hidden>Saved on this device &mdash; you&rsquo;ll be signed in next time you open this page.</p>
+      </form>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <span>Made and maintained by Hacker · SCDS</span>
+    <span class="dot-sep" aria-hidden="true">&middot;</span>
+    <span id="updatedLabel">Updated just now</span>
+  </footer>
+
+</div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
