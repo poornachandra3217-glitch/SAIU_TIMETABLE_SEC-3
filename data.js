@@ -42,7 +42,7 @@ const TIMETABLE = {
   dayWindow: { start: "09:00", end: "17:00" },
   timetable: {
     mon: [
-      { type: "lecture", subject: "Linear Algebra",        faculty: "Prof. Dr. Tamilarasi",     room: "AB2 - 202", start: "09:15", end: "10:10" },
+      { type: "lecture", subject: "Linear Algebra",        faculty: "Prof. Dr. Tamilarasi",     room: "AB2 - 202", start: "09:00", end: "10:10" },
       { type: "lecture", subject: "Linear Algebra",    faculty: "Prof. Dr. Tamilarasi",  room: "AB2 - 202", start: "10:15", end: "11:10" },
       { type: "lab",     subject: "Design and Analysis of Algorithms Lab",      faculty: "Prof. Nitish",        room: "AB1 - Computer Lab", start: "11:15", end: "12:10" },
       { type: "lab",     subject: "Design and Analysis of Algorithms Lab",      faculty: "Prof. Nitish",        room: "AB1 - Computer Lab", start: "12:15", end: "13:10" },
